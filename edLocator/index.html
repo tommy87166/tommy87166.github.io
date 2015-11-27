@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="bins.js"></script>
+    <script src="electoralDistricts.js"></script>
+    <script src="action.js"></script>
+    <script src="watchout.js"></script>
+    <title>找選區</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0px;
+      }
+      #map {
+        height: 100%;
+        opacity: 1;
+      }
+      #info{
+        position: fixed;
+        z-index: 1;
+        bottom: 5px;
+        left: 5px;
+        opacity: 0.9;
+      }
+      #control{
+        position: fixed;
+        z-index: 1;
+        top: 5px;
+        width: 100%;
+        right: 0px;
+        left:0px;
+        margin: auto;
+        max-width: 500px;
+      }
+      #actionBar{
+        position: fixed;
+        z-index: 1;
+        top: 55px;
+        width: 100%;
+        right: 0px;
+        left:0px;
+        margin: auto;
+      }
+      .alert{
+        border-radius:50px;
+        text-align: center;
+        width: 200px;
+        margin: auto;
+      }
+      .legislator{
+        margin: 1.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="control">
+      <div class="input-group input-group-lg">
+        <input id='addressInput' type="text" class="form-control" placeholder="輸入地址">
+        <div class="input-group-btn">
+          <button class="btn btn-default btn-primary" onclick="byGPS()"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
+        </div>
+      </div>
+    </div>
+    <div id="info">
+      <span id='formatted' style='display:block;font-size:24px;white-space:normal;' class="label label-default"></span>
+      <span id='level1'  class="label label-default"></span>
+      <span id='level2'  class="label label-default"></span>
+      <span id='level3'  class="label label-default"></span>
+      <span id='level4'  class="label label-default"></span>
+    </div>
+    <div id="actionBar" style="display:none;">
+      <div class="alert alert-success" role="alert"><strong><span id='largeD'></span> 第 <span id='smallD'></span> 區</strong></div>
+      <div id= "legislator" style="text-align:center;margin-top:5px;"></div>
+    </div>
+
+    <script>
+      alert('立委候選人資料待中選會公布後更新。\n\n選區資料更新日期：2015.11.27\n\n選區資料：中選會\n\n立委資料來源：g0v-立委投票指南(vote.ly.g0v.tw)\n\n立委立場資料：沃草-立委出任務(wevote.tw)\n\nMade by Tommy Pai (白峰瑞).')
+      var outlinkBaseURL = 'http://vote.ly.g0v.tw/candidates/8/{{largeD}}/{{smallD}}/'
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4fOBDe3L2Id0-DfSOdXiIjEAPi6wg77I&callback=initMap"
+        async defer></script>
+  </body>
+</html>
