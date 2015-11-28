@@ -20,7 +20,7 @@ function displayLegislator(data){
       var color = 'btn-primary'
     }
     else{
-      var href ='http://www.google.com.tw/search?q="'+data[x][0]+'"+"立委"+"'+data[x][1]+'"'
+      var href ='http://www.google.com.tw/search?q=%22'+data[x][0]+'%22+%22立委%22+%22'+data[x][1]+'%22'
       var color = 'btn-default'
     }
     $('#legislator').append('<a target="info" href="'+href+'"  type="button" class="btn '+color+' legislator"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> '+data[x][0]+' ('+data[x][1]+')</a>')
