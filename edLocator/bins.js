@@ -13,13 +13,13 @@ function initMap() {
   });
 }
 
-
 function geocode(type,centering,content) {
   var input;
   if (type){input = {'address': content};}
   else {input = {'location': content};}
   geocoder.geocode(input, function(results, status) {
     if (status === google.maps.GeocoderStatus.OK) {
+      console.log('Raw Results:',results);
       processResult(results[0]);
       if (centering == true){
       map.setCenter(results[0].geometry.location);
@@ -32,9 +32,17 @@ function geocode(type,centering,content) {
       setTimeout(function(){marker.setAnimation(null);},750);
     }
     else {
-      alert('Geocode was not successful for the following reason: ' + status);
+      console.log('[ERROR] Geocode was not successful for the following reason: ' + status);
     }
   });
+}
+
+function processResult(result){
+  var formatted = result.formatted_address;
+  var parsed = parseAddressComponents(result.address_components);
+  console.log('Parsed Fist Result:',parsed)
+  display(parsed,formatted);
+  action(getMostFit(parsed));
 }
 
 function parseAddressComponents(address_components){
@@ -61,14 +69,6 @@ function display(parsed,formatted){
   document.getElementById('formatted').innerHTML=formatted;
 }
 
-function processResult(result){
-  var formatted = result.formatted_address;
-  var parsed = parseAddressComponents(result.address_components);
-  display(parsed,formatted);
-  action(getMostFit(parsed));
-}
-
-
 function getMostFit(address_components){
   function search(source,position,term){
     var results = [];
@@ -84,7 +84,6 @@ function getMostFit(address_components){
   }
   return false;
 }
-
 
 function byGPS(){
   function gpsCallback(location) {

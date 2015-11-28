@@ -1,17 +1,17 @@
 function action(mostFit){
-if (mostFit != false){
-  //Set largeD and smallD
-  $('#actionBar').fadeIn();
-  $('#largeD').html(mostFit[4]);
-  $('#smallD').html(mostFit[5]);
-  $('#legislator').empty();
-  $('#legislator').hide();
-  displayLegislator(candidate[mostFit[4]+'-'+mostFit[5]]);
-}
-else {$('#actionBar').fadeOut();}
+  console.log('Most Fit:',mostFit);
+  if (mostFit != false){
+    $('#actionBar').fadeIn();
+    $('#largeD').html(mostFit[4]);
+    $('#smallD').html(mostFit[5]);
+    $('#legislator').empty();
+    $('#legislator').hide();
+    showLegislator(candidate[mostFit[4]+'-'+mostFit[5]]);
+  }
+  else {$('#actionBar').fadeOut();}
 }
 
-function displayLegislator(data){
+function showLegislator(data){
   $('#legislator').fadeIn();
   for (var x=0;x<data.length;x++){
     var watchoutlegislatorID = watchoutLegislator[data[x][0]];
