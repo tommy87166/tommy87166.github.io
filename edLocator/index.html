@@ -59,6 +59,26 @@
       .legislator{
         margin: 1.5px;
       }
+      #externalInfo{
+        position: fixed;
+        bottom: 0px;
+        right:0px;
+        left:0px;
+        width: 100%;
+        height: 100%;
+        max-width: 600px;
+        max-height:600px;
+        z-index: 2;
+        margin: auto;
+        display: none;
+      }
+      #externalInfo > .panel-body{
+        height: 90%;
+        overflow-x: hidden;
+      }
+      .media {
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
@@ -83,9 +103,47 @@
       <div class="alert alert-success" role="alert"><strong><span id='largeD'></span> 第 <span id='smallD'></span> 區</strong></div>
       <div id= "legislator" style="text-align:center;margin-top:5px;"></div>
     </div>
+    <div id='externalInfo' class="panel panel-default">
+      <div  class="panel-heading">
+        <h3 class="panel-title"><b>Panel title</b></h3>
+        <button class="btn btn-danger btn-sm" onclick='$("#externalInfo").slideUp()' style="position:absolute;right:0px;top:-1px;height:38.5px;border-top-left-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;width:45px;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+      </div>
+      <div class="panel-body" >
+
+        <div class="media" id='externalInfo_google'>
+          <div class="media-left media-middle"><img class="media-object" width='200px' src="google.png" ></div>
+          <div class="media-body">
+            <h4 class="media-heading"><b>Google 搜尋</b></h4>
+            以關鍵字搜尋掌握立委候選人其他動態。
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="media" id='externalInfo_votely'>
+          <div class="media-left media-middle"><img class="media-object" width='200px' src="votely.png" ></div>
+          <div class="media-body">
+            <h4 class="media-heading"><b>立委投票指南</b></h4>
+            減少盲目投票，讓民主社會的台灣更進步！利用「立委投票指南」掌握候選人過去在立法院的表現。
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="media" id='externalInfo_watchout'>
+          <div class="media-left media-middle"><img class="media-object" width='200px' src="watchout.svg" ></div>
+          <div class="media-body">
+            <h4 class="media-heading"><b>立委出任務</b></h4>
+            2016立委選舉票該投給誰？利用「立委出任務」快速了解候選對各項議題的立場。
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
 
     <script>
-
       function disclaimer(){
         alert('選區資料更新日期：2015.11.27\n立委候選人資料更新日期：2015.11.28\n\n立委立場資料：沃草-立委出任務(wevote.tw)\n\nMade by Tommy Pai (白峰瑞).')
       }
