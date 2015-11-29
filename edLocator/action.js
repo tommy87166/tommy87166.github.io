@@ -1,6 +1,7 @@
 function action(mostFit){
   console.log('Most Fit:',mostFit);
   if (mostFit != false){
+    $('#addressInput').blur();
     $('#actionBar').fadeIn();
     $('#largeD').html(mostFit[4]);
     $('#smallD').html(mostFit[5]);
@@ -8,7 +9,7 @@ function action(mostFit){
     $('#legislator').hide();
     showLegislator(candidate[mostFit[4]+'-'+mostFit[5]],mostFit[4],mostFit[5]);
   }
-  else {$('#actionBar').fadeOut();}
+  else {$('#actionBar').fadeOut();$('#addressInput').val('');$('#addressInput').attr('placeholder','沒有結果，請嘗試輸入完整地址。');$('#addressInput').focus()}
 }
 
 function showLegislator(data,largeD,smallD){

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <script src="https://code.jquery.com/jquery.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -12,6 +13,10 @@
     <title>2016 大選區域立委地圖</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
+    <meta property="og:title"  content="2016 大選區域立委地圖" />
+    <meta property="og:image"  content="http://tommy87166.github.io/edLocator/facebookOG.png" />
+    <meta property="og:url"    content="http://tommy87166.github.io/edLocator/" />
+    <meta property="og:description" content="2016 立委大選將至！快來看看你選區的候選人有誰。" />
     <style>
       html, body {
         height: 100%;
@@ -26,8 +31,8 @@
         position: fixed;
         z-index: 1;
         bottom: 5px;
-        left: 5px;
         opacity: 0.9;
+        width: 100%;
       }
       #control{
         position: fixed;
@@ -79,25 +84,38 @@
       .media {
         cursor: pointer;
       }
+      #gpsBtn{
+        position: fixed;
+        right: 5px;
+        bottom: 75px;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <div id="control">
+
       <div class="input-group input-group-lg">
         <input id='addressInput' type="text" class="form-control" placeholder="輸入地址">
         <div class="input-group-btn">
-          <button class="btn btn-default btn-primary" onclick="byGPS()"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
+          <button class="btn btn-default btn-success" onclick="sendAddressQuery()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
         </div>
       </div>
     </div>
+
     <div id="info">
-      <span id='formatted' style='display:block;font-size:18px;white-space:normal;' class="label label-default"></span>
-      <span id='level1'  class="label label-default" style="display:none"></span>
-      <span id='level2'  class="label label-default" style="display:none"></span>
-      <span id='level3'  class="label label-default" style="display:none"></span>
-      <span id='level4'  class="label label-default" style="display:none"></span>
-      <span class="label label-default" onclick='disclaimer()'>關於</span>
+      <div style="position:absolute;top:-39px;right:5px;">
+        <button class="btn btn-default btn-success" onclick="byGPS()"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></button>
+      </div>
+      <div style="display:inline-block;position:relative;left:5px;">
+        <span id='formatted' style='display:block;font-size:18px;white-space:normal;' class="label label-default"></span>
+        <span id='level1'  class="label label-default" style="display:none"></span>
+        <span id='level2'  class="label label-default" style="display:none"></span>
+        <span id='level3'  class="label label-default" style="display:none"></span>
+        <span id='level4'  class="label label-default" style="display:none"></span>
+        <span class="label label-default" onclick='disclaimer()'>關於</span>
+      </div>
     </div>
     <div id="actionBar" style="display:none;">
       <div class="alert alert-success" role="alert"><strong><span id='largeD'></span> 第 <span id='smallD'></span> 區</strong></div>
@@ -145,7 +163,7 @@
 
     <script>
       function disclaimer(){
-        alert('選區資料更新日期：2015.11.27\n立委候選人資料更新日期：2015.11.28\n\n立委立場資料：沃草-立委出任務(wevote.tw)\n\nMade by Tommy Pai (白峰瑞).')
+        alert('選區資料更新日期：2015.11.27\n立委候選人資料更新日期：2015.11.28\n\nMade by Tommy Pai (白峰瑞).')
       }
       function debugCandidate(){
         var count=0;

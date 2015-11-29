@@ -96,15 +96,19 @@ function byGPS(){
 }
 
 $(document).ready(function(){
-  //Enter then search binding
-  $("#addressInput").keyup(function (e) {
-      if (e.keyCode == 13) {
-          geocode(true,true,$("#addressInput").val());
-        }
-      });
+  //Enter send
+  $('#addressInput').keyup(function(e){
+    if (e.keyCode == 13){sendAddressQuery();}
+  })
+  //Alert
+  alert('注意：在 Facebook 中可能無法自動定位，請選擇用 Chorme 或 Safari 開啟。')
   //Do Gps Locating
   byGPS();
 })
+
+function sendAddressQuery(){
+  geocode(true,true,$("#addressInput").val());
+}
 
 $(window).resize(function(){
     if (lastCenter != false){
