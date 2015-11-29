@@ -67,6 +67,7 @@ function display(parsed,formatted){
   document.getElementById('level3').innerHTML=parsed[2];
   document.getElementById('level4').innerHTML=parsed[3];
   document.getElementById('formatted').innerHTML=formatted;
+  $('#addressInput').val(formatted);
 }
 
 function getMostFit(address_components){
@@ -88,11 +89,10 @@ function getMostFit(address_components){
 function byGPS(){
   function gpsCallback(location) {
       geocode(false,true,{lat:location.coords.latitude,lng:location.coords.longitude});
-      $('#addressInput').attr('placeholder','已定位，你也可以輸入地址。');
-  }
+      $('#addressInput').attr('placeholder','輸入地址');}
   navigator.geolocation.getCurrentPosition(gpsCallback);
   $('#addressInput').val('');
-  $('#addressInput').attr('placeholder','正在定位...');
+  $('#addressInput').attr('placeholder','正在定位... 你也可以直接輸入地址。');
 }
 
 $(document).ready(function(){

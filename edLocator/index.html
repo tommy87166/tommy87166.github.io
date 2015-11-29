@@ -96,7 +96,7 @@
     <div id="map"></div>
     <div id="control">
 
-      <div class="input-group input-group-lg">
+      <div class="input-group input-group-lg" style="margin-right:5px;margin-left:5px;">
         <input id='addressInput' type="text" class="form-control" placeholder="輸入地址">
         <div class="input-group-btn">
           <button class="btn btn-default btn-success" onclick="sendAddressQuery()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
@@ -105,11 +105,11 @@
     </div>
 
     <div id="info">
-      <div style="position:absolute;top:-39px;right:5px;">
-        <button class="btn btn-default btn-success" onclick="byGPS()"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></button>
+      <div style="position:absolute;bottom:0px;right:5px;">
+        <button class="btn btn-default btn-success btn-lg" onclick="byGPS()"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></button>
       </div>
       <div style="display:inline-block;position:relative;left:5px;">
-        <span id='formatted' style='display:block;font-size:18px;white-space:normal;' class="label label-default"></span>
+        <span id='formatted' style="display:none" style='display:block;font-size:18px;white-space:normal;' class="label label-default"></span>
         <span id='level1'  class="label label-default" style="display:none"></span>
         <span id='level2'  class="label label-default" style="display:none"></span>
         <span id='level3'  class="label label-default" style="display:none"></span>
@@ -163,7 +163,7 @@
 
     <script>
       function disclaimer(){
-        alert('選區資料更新日期：2015.11.27\n立委候選人資料更新日期：2015.11.28\n\nMade by Tommy Pai (白峰瑞).')
+        alert('資料來源：中選會\n\nMade by Tommy Pai (白峰瑞).\n\n採用 創用CC\n姓名標示─非商業性─相同方式分享\n授權')
       }
       function debugCandidate(){
         var count=0;

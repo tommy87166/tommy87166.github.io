@@ -9,7 +9,13 @@ function action(mostFit){
     $('#legislator').hide();
     showLegislator(candidate[mostFit[4]+'-'+mostFit[5]],mostFit[4],mostFit[5]);
   }
-  else {$('#actionBar').fadeOut();$('#addressInput').val('');$('#addressInput').attr('placeholder','沒有結果，請嘗試輸入完整地址。');$('#addressInput').focus()}
+  else {
+    $('#actionBar').fadeOut();
+    $('#addressInput').val('');
+    $('#addressInput').attr('placeholder','沒有結果，請嘗試輸入完整地址。');
+    setTimeout(function(){$('#addressInput').attr('placeholder','輸入地址');},3000);
+    $('#addressInput').focus();
+  }
 }
 
 function showLegislator(data,largeD,smallD){
