@@ -1,0 +1,112 @@
+﻿<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>NCCU 會研所快速找課</title>
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <style>
+      .list-group{display: none;}
+      .panel {margin: 10px;}
+      .panel-body {position: relative;}
+      .badge {position: absolute;top: 42%;right:15px;}
+      .label-onlyword{color: black;padding:0px;font-weight:100;margin-right: 5px;}
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <select id='option' onchange='filter(this.value)' class="form-control" style="margin: auto;margin-top: 10px;width: 90%;max-width: 400px;">
+            <option value="all">全部</option>
+          </select>
+        </div>
+      </div>
+      <div class="row"><div id='display' class="col-md-12"></div></div>
+    </div>
+
+  </body>
+
+
+  <script>
+    var template = '<div id="{{ID}}" data-name="{{name}}" data-belongs="{{belongs}}" class="panel-body" onclick="displayDetail(this)"><span class="label label-default">{{belongs}}</span><h4><b>{{name}}</b></h4><span class="label label-onlyword">{{pass}}</span> </div> <ul class="list-group"> <li class="list-group-item">開課系所：{{department}}</li> <li class="list-group-item">授課教師：{{instructor}}</li> <li class="list-group-item">必/選修：{{type}}</li> <li class="list-group-item">學分：{{credit}}</li> </ul>'
+    var success_otter_template='<li class="list-group-item searchResult"><h5><b>已開課</b></h5></li>'
+    var success_inner_template='<p><span class="label label-onlyword"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>&nbsp;{{serial}}</span><span class="label label-onlyword">{{name}}</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="label label-onlyword"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;{{department}}</span><span class="label label-onlyword"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;{{instructor}}</span> </p>'
+
+    function render(data,template){
+      var keys = Object.keys(data);
+      for (var x=0;x<keys.length;x++){
+        var re = new RegExp('{{'+keys[x]+'}}', 'g');
+        template = template.replace(re,data[keys[x]])
+      }
+      return template
+    }
+
+    //Load Data
+    var csv = d3.dsv(",", "text/csv;charset=big5");
+    csv('courses.csv',function(result){listData(result);filterOutBelongs(result);})
+
+    function listData(courses){
+      //建立資料係結
+      tr_data_bind = d3.select('#display').selectAll("div").data(courses);
+      tr_set = tr_data_bind.enter().append('div').attr('class','panel panel-default'); /*為「沒有物件可配對的資料」建立標籤 */
+      tr_data_bind.exit().remove(); /* 刪除「沒有資料可配對的物件」*/
+      //呈現資料
+      tr_data_bind.html(function(d,i){
+        var copyCourse = Object.assign({}, d);
+        var ID = Math.random().toString(36).substring(7);
+        copyCourse['ID'] = ID
+        setTimeout(function(){checkCourseAvaliable(ID)},2000)
+        return render(copyCourse,template)
+      })
+    }
+
+    function checkCourseAvaliable(ID){
+      var name=$('#'+ID)[0].dataset.name;
+      var success = function(response){
+        if (response.meta.page.total == 0) {$('#'+ID).parent().fadeOut(function(){$(this).remove()});}
+        else{
+          var searchResult = response.data;
+          $('#'+ID).parent().find('.list-group').append(success_otter_template)
+          $('#'+ID).append('<span class="badge">'+searchResult.length+'</span>')
+          for (var x=0;x<searchResult.length;x++){
+            $('#'+ID).parent().find('.searchResult').append(render(searchResult[x],success_inner_template));
+          }
+        }
+      }
+      $.getJSON('https://crossorigin.me/https://chake.myceto.com/api/v1/courses',{'page':1,'query':name},success)
+    }
+
+    function displayDetail(item){
+      $(item).parent().find('.list-group').slideToggle()
+    }
+
+    function filter(query){
+      var panel_body = $('.panel-body');
+      if (query == 'all') {panel_body.parent().fadeIn();}
+      else{
+        for (var x=0;x<panel_body.length;x++) {
+          if (panel_body[x].dataset.belongs == query){$(panel_body[x]).parent().fadeIn()}
+          else {$(panel_body[x]).parent().fadeOut()}
+        }
+      }
+    }
+
+    function GetUnique(inputArray) {
+      var outputArray = [];
+      for (var i = 0; i < inputArray.length; i++) {
+        if ((jQuery.inArray(inputArray[i], outputArray)) == -1) {
+          outputArray.push(inputArray[i]);
+        }
+      }
+      return outputArray;
+    }
+
+    function filterOutBelongs(courses){
+      var belongs = []
+      courses.forEach(function(item){belongs.push(item.belongs)})
+      GetUnique(belongs).forEach(function(item){$('#option').append('<option value="'+item+'">'+item+'</option>')})
+    }
+  </script>
+</html>
