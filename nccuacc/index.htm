@@ -57,7 +57,7 @@
         var copyCourse = Object.assign({}, d);
         var ID = Math.random().toString(36).substring(7);
         copyCourse['ID'] = ID
-        setTimeout(function(){checkCourseAvaliable(ID)},2000)
+        setTimeout(function(){checkCourseAvaliable(ID)},1000)
         return render(copyCourse,template)
       })
     }
