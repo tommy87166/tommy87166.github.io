@@ -32,7 +32,7 @@
   <script>
     var template = '<div id="{{ID}}" data-name="{{name}}" data-belongs="{{belongs}}" class="panel-body" onclick="displayDetail(this)"><span class="label label-default">{{belongs}}</span><h4><b>{{name}}</b></h4><span class="label label-onlyword">{{pass}}</span> </div> <ul class="list-group"> <li class="list-group-item">開課系所：{{department}}</li> <li class="list-group-item">授課教師：{{instructor}}</li> <li class="list-group-item">必/選修：{{type}}</li> <li class="list-group-item">學分：{{credit}}</li> </ul>'
     var success_otter_template='<li class="list-group-item searchResult"><h5><b>已開課</b></h5></li>'
-    var success_inner_template='<p><span class="label label-onlyword"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>&nbsp;{{serial}}</span><span class="label label-onlyword">{{name}}</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="label label-onlyword"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;{{department}}</span><span class="label label-onlyword"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;{{instructor}}</span> </p>'
+    var success_inner_template='<p> <span class="label label-onlyword"> <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span> &nbsp;{{serial}}&nbsp;{{name}}&nbsp; <span class="glyphicon glyphicon-user" aria-hidden="true"></span> &nbsp;{{instructor}} <br> <span class="glyphicon glyphicon-home" aria-hidden="true"></span> &nbsp;{{department}} </span> </p>'
 
     function render(data,template){
       var keys = Object.keys(data);
