@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Created using jsbin.com
+  Source can be edited via http://jsbin.com/redaz/34/edit
+-->
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="http://hamiprint.bytommy.tw/static/jquery.clipboard.js"></script>
+<meta charset="utf-8">
+<title>自己的直書自己轉</title>
+
+<style id="jsbin-css">
+#textinput {width:100%;height:200px;resize:vertical;}
+#output {width:100%;min-height:200px;overflow-y:hidden;cursor: text;background-color:white;}
+p {margin-top:0px;margin-bottom:0px;white-space:nowrap;}
+.container{margin:auto;}
+.col-md-12{text-align:center;}
+.input-group{width:150px;margin-top: 15px;}
+.col-md-6{margin-top:30px;}
+</style>
+</head>
+
+<body>
+  <div class='container'>
+    <div class='row'>
+      <div class='col-md-12'>
+        <h1>自己的直書自己轉！</h1>
+        <br>
+        <p>您已經輸入<span id='word_count' class='label label-primary'>0</span>個字了</p>
+      </div>
+      
+      
+      <div class='col-md-6'>
+      <h4>輸入框</h4>
+      <textarea class="form-control" oninput='do_convert()' id='textinput' placeholder='輸入要轉換的文字'></textarea>
+      <div class="input-group">
+          <input id='word_num' oninput='do_convert()' type="text" class="form-control">
+          <span class="input-group-addon">個字換一行</span>
+      </div>
+      <p>提醒：如果字數太多導致有並排的狀況，請增加每行字數。</p>
+      </div>
+      
+      <div class='col-md-6'>
+      <h4>輸出框 (以滑鼠選取並右鍵複製)</h4>
+      <textarea class="form-control" id='output' readonly></textarea>
+    
+      </div>
+    </div>
+  </div> 
+<script>
+function h2v(words_in_column,word) {
+wordscount=word.length
+if ( wordscount%words_in_column ==0 ){ columnscount=wordscount/words_in_column }
+else { columnscount=Math.floor(wordscount/words_in_column)+1 }
+wordsneedadd=columnscount*words_in_column-wordscount
+//補字數
+count=0
+while (count < wordsneedadd){
+word=word+'　';
+count=count+1;
+}
+wordscount=word.length
+//取最後一欄的順序
+initial=[]
+count=0
+while (count < words_in_column){
+initial.push(wordscount-1-count)
+count=count+1
+}
+initial.reverse()
+//取字
+rows=[]
+for (var i=0; i < initial.length ; i++){
+row=''
+count=0
+while (count < columnscount){
+new_word=word[initial[i]-words_in_column*count]
+row=row+filter(new_word)+'　'
+count=count+1
+}
+rows.push(row)
+}
+return rows
+}
+
+function filter(w){
+dict={
+
+"0":"０",
+"1":"１",
+"2":"２",
+"3":"３",
+"4":"４",
+"5":"５",
+"6":"６",
+"7":"７",
+"8":"８",
+"9":"９",
+"a":"ａ",
+"b":"ｂ",
+"c":"ｃ",
+"d":"ｄ",
+"e":"ｅ",
+"f":"ｆ",
+"g":"ｇ",
+"h":"ｈ",
+"i":"ｉ",
+"j":"ｊ",
+"k":"ｋ",
+"l":"ｌ",
+"m":"ｍ",
+"n":"ｎ",
+"o":"ｏ",
+"p":"ｐ",
+"q":"ｑ",
+"r":"ｒ",
+"s":"ｓ",
+"t":"ｔ",
+"u":"ｕ",
+"v":"ｖ",
+"w":"ｗ",
+"x":"ｘ",
+"y":"ｙ",
+"z":"ｚ",
+"A":"Ａ",
+"B":"Ｂ",
+"C":"Ｃ",
+"D":"Ｄ",
+"E":"Ｅ",
+"F":"Ｆ",
+"G":"Ｇ",
+"H":"Ｈ",
+"I":"Ｉ",
+"J":"Ｊ",
+"K":"Ｋ",
+"L":"Ｌ",
+"M":"Ｍ",
+"N":"Ｎ",
+"O":"Ｏ",
+"P":"Ｐ",
+"Q":"Ｑ",
+"R":"Ｒ",
+"S":"Ｓ",
+"T":"Ｔ",
+"U":"Ｕ",
+"V":"Ｖ",
+"W":"Ｗ",
+"X":"Ｘ",
+"Y":"Ｙ",
+"Z":"Ｚ",
+"~":"～",
+"!":"！",
+"@":"＠",
+"$":"＄",
+"%":"％",
+"^":"︿",
+"&":"＆",
+"*":"＊",
+"(":"（",
+")":"）",
+"-":"－",
+"_":"﹍",
+"＋":"＋",
+"=":"＝",
+"[":"〔",
+"]":"〕",
+"{":"｛",
+"}":"｝",
+"|":"｜",
+";":"；",
+":":"：",
+",":"，",
+"<":"＜",
+".":"。",
+">":"＞",
+"?":"？",
+"/":"／",
+" ":"　",
+"\n":"　",
+}
+
+if (Object.keys(dict).indexOf(w) != -1) {return dict[w]}
+else {return w}
+}
+
+function do_convert() {
+$('#word_count').html($('#textinput').val().length)
+$('#output').html('')
+$('#output').attr('rows',$('#word_num').val())
+rows=h2v($('#word_num').val(),$('#textinput').val())
+for (var i=0 ; i < rows.length ; i++) {
+$('#output').append(rows[i]+'\n')
+}
+window.localStorage.setItem('word',$('#textinput').val())
+window.localStorage.setItem('num',$('#word_num').val())
+}
+
+if (window.localStorage.getItem('word')==null || window.localStorage.getItem('num')==null){
+  console.log("First Run!")
+  window.localStorage.setItem('word','自己的直書自己轉，自己的鴿子自己趕！')
+  window.localStorage.setItem('num',8)
+}
+$('#textinput').val(window.localStorage.getItem('word'))
+$('#word_num').val(window.localStorage.getItem('num'))
+do_convert()
+</script>
+</body>
+</html>
