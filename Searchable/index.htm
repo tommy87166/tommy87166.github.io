@@ -78,7 +78,17 @@
       $('#table').html('<table class="table table-striped table-hover"></table>')
       var columns = d3.keys(data[0]).map(function(item){return {'title':item}})
       var data = d3.csv.parseRows(d3.csv.format(data)).slice(1)
-      console.log(columns,data)
+      //CSV 檔若最後一欄為空，則該列的資料個數會不等於欄數，DataTablec 會跳 Warning
+      //確定每列資料個數皆為欄數，否則補齊至欄數
+      var column_count = columns.length
+      data = data.map(function(d){
+        if (d.length < column_count) {
+          var delta = column_count - d.length
+          for (var x=0;x<delta;x++){d.push("")}
+          return d
+        }
+        else {return d}
+      })
       $('#table > .table').DataTable( {
         data: data,
         columns: columns
