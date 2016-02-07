@@ -20,7 +20,7 @@
     <div class="container-fluid" style="margin-top:15px;">
       <div class="row">
 
-        <div class="col-md-2">
+        <div id="optionPanel" style="display:none;">
           <div class="panel panel-default">
             <div class="panel-heading"><b>Filter</b></div>
             <div class="panel-body"><button class="btn btn-success btn-block" type="button" onclick="showTable(csv)">Show All</button></div>
@@ -29,9 +29,29 @@
           </div>
         </div>
 
-        <div class="col-md-10">
+        <div class="col-md-12" id="tablePanel" style="display:none;opacity:0;">
           <div class="table-responsive" id='table'></div>
         </div>
+
+        <div class="col-md-12" id="intro" style="display:none;">
+          <h1>Searchable CSV</h1>
+          <h4>Make your CSV file searchable instantly.</h4>
+          <br>
+          <h3>Display Data</h3>
+          <p>Simply add CSV source behind URL.</p>
+          <code>http://tommy87166.github.io/Searchable?source=[Your CSV Source]&</code>
+          <h3>Specify Categorized Item</h3>
+          <p>You can specify categorized item like sex, city, etc.  </p>
+          <code>http://tommy87166.github.io/Searchable?source=[Your CSV Source]&cColumn=[Column Index eg. 0,1,2]&</code>
+          <h3>CSV Data isn't start at Row 0.</h3>
+          <p>Specify the first row (also header row) of your data.  </p>
+          <code>http://tommy87166.github.io/Searchable?source=[Your CSV Source]&cColumn=[Column Index eg. 0,1,2]&keyrow=[Row Index eg.1]&</code>
+          <br>
+          <br>
+          <br>
+          <p>By Tommy Pai (tommy87166@gmail.com)</p>
+        </div>
+
 
       </div>
     </div>
@@ -104,15 +124,21 @@
       if (categorizedItem) {categorizedItem = categorizedItem.split(',').map(function(d){return parseInt(d)})}
       console.log('Parameter:',source,keyRow,categorizedItem)
       if (source) {
+        $('#tablePanel').show();
         d3.text("https://crossorigin.me/"+source, function(text) {
           csv = d3.csv.parse(d3.csv.formatRows(d3.csv.parseRows(text).slice(keyRow)));
-          var option = getSelectionForCategorizedItem(csv,categorizedItem)
+          if (categorizedItem){
+            generateFilter(getSelectionForCategorizedItem(csv,categorizedItem))
+            $("#tablePanel").removeClass("col-md-12").addClass("col-md-10")
+            $("#optionPanel").addClass("col-md-2")
+            $("#optionPanel").slideDown();
+          }
           showTable(csv)
-          generateFilter(option)
+          $("#tablePanel").animate({opacity:1},1000)
         });
       }
       else{
-        console.log('No Data')
+        $('#intro').show();
       }
     })
 
