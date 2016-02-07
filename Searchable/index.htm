@@ -40,12 +40,44 @@
           <h3>Display Data</h3>
           <p>Simply add CSV source behind URL.</p>
           <code>http://tommy87166.github.io/Searchable?source=[Your CSV Source]&</code>
-          <h3>Specify Categorized Item</h3>
-          <p>You can specify categorized item like sex, city, etc.  </p>
+          <h3>Column and Row Index</h3>
+          <table class="table table-condensed table-bordered table-striped">
+            <thead><tr><td>Column,Row = 0,0 </td><td>Column = 1</td><td>Column = 2</td><td>...</td></tr></thead>
+            <tbody><tr><td>Row = 1 </td><td></td><td></td><td></td></tr></tbody>
+            <tbody><tr><td>Row = 2 </td><td></td><td></td><td></td></tr></tbody>
+            <tbody><tr><td>... </td><td></td><td></td><td></td></tr></tbody>
+          </table>
+          <h3>Specify columns which has categorical variable.</h3>
+          <p>You can specify columns which contains categorical variable like sex, city, etc. The program will gather all possible outcomes and make data sortable.</p>
           <code>http://tommy87166.github.io/Searchable?source=[Your CSV Source]&cColumn=[Column Index eg. 0,1,2]&</code>
           <h3>CSV Data isn't start at Row 0.</h3>
-          <p>Specify the first row (also header row) of your data.  </p>
+          <p>Specify the first row (also the header row) of your data.</p>
           <code>http://tommy87166.github.io/Searchable?source=[Your CSV Source]&cColumn=[Column Index eg. 0,1,2]&keyrow=[Row Index eg.1]&</code>
+          <br>
+          <br>
+          <br>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Link Generator</h3>
+            </div>
+            <div class="panel-body">
+              <form class="form-inline">
+                <div class="form-group">
+                  <label for="exampleInputName2">Source</label>
+                  <input type="text" class="form-control" id="SOURCE" placeholder="Required">
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail2">Key Row (First Row)</label>
+                  <input type="text" class="form-control" id="KEYROW" value = "0">
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail2">Column with Categorical Value</label>
+                  <input type="text" class="form-control" id="CCOLUMN" placeholder = "Ex. 0,1,2">
+                </div>
+                <button type="button" onclick="generateURL()" class="btn btn-default">Go</button>
+              </form>
+            </div>
+          </div>
           <br>
           <br>
           <br>
@@ -58,6 +90,11 @@
   </body>
 
   <script>
+    function generateURL(){
+      var url = window.location.origin + window.location.pathname +'?source='+$("#SOURCE").val()+'&keyrow='+$("#KEYROW").val()+'&cColumn='+$("#CCOLUMN").val()+'&'
+      window.location.href = url
+    }
+
     function FilteAndShow(item){
       var category = item.dataset['key']
       var value = item.text
