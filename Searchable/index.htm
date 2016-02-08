@@ -97,7 +97,7 @@
 
     function FilteAndShow(item){
       var category = item.dataset['key']
-      var value = item.text
+      var value = item.dataset['value']
       showTable(csv.filter(function(d){return d[category] == value}))
     }
 
@@ -105,7 +105,7 @@
       var Keys = d3.keys(option);
       for (var x=0;x<Keys.length;x++){
         var Key = Keys[x]
-        var Items = option[Key].map(function(d){return '<li><a href="#" data-key="'+Key+'" onclick="FilteAndShow(this)">'+d+'</a></li>'}).join('')
+        var Items = option[Key].map(function(d){if(d==''){var dText='Null'}else{var dText=d} return '<li><a href="#" data-key="'+Key+'" data-value="'+d+'" onclick="FilteAndShow(this)">'+dText+'</a></li>'}).join('')
         var output = '<li class="list-group-item"><div class="btn-group btn-block"><button type="button" class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+Key+' <span class="caret"></span> </button> <ul class="dropdown-menu"> '+Items+' </ul> </div></li>'
         $('#options').append(output)
       }
@@ -158,6 +158,7 @@
       categorizedItem = getParameterByName('cColumn');
       //If keyrow is not specified, then equal to 0.
       if (!keyRow) {keyRow=0;}
+      //Parse categorizedItem into int list.
       if (categorizedItem) {categorizedItem = categorizedItem.split(',').map(function(d){return parseInt(d)})}
       console.log('Parameter:',source,keyRow,categorizedItem)
       if (source) {
@@ -165,7 +166,8 @@
         d3.text("https://crossorigin.me/"+source, function(text) {
           csv = d3.csv.parse(d3.csv.formatRows(d3.csv.parseRows(text).slice(keyRow)));
           if (categorizedItem){
-            generateFilter(getSelectionForCategorizedItem(csv,categorizedItem))
+            options = getSelectionForCategorizedItem(csv,categorizedItem)
+            generateFilter(options)
             $("#tablePanel").removeClass("col-md-12").addClass("col-md-10")
             $("#optionPanel").addClass("col-md-2")
             $("#optionPanel").slideDown();
