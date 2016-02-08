@@ -105,7 +105,7 @@
       var Keys = d3.keys(option);
       for (var x=0;x<Keys.length;x++){
         var Key = Keys[x]
-        var Items = option[Key].map(function(d){if(d==''){var dText='Null'}else{var dText=d} return '<li><a href="#" data-key="'+Key+'" data-value="'+d+'" onclick="FilteAndShow(this)">'+dText+'</a></li>'}).join('')
+        var Items = option[Key].map(function(d){if(d[0]==''){var dText='Null ('+d[1]+')'}else{var dText=d[0]+' ('+d[1]+')'} return '<li><a href="#" data-key="'+Key+'" data-value="'+d[0]+'" onclick="FilteAndShow(this)">'+dText+'</a></li>'}).join('')
         var output = '<li class="list-group-item"><div class="btn-group btn-block"><button type="button" class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+Key+' <span class="caret"></span> </button> <ul class="dropdown-menu"> '+Items+' </ul> </div></li>'
         $('#options').append(output)
       }
@@ -126,7 +126,9 @@
       var categorizedItem = categorizedItem.map(function(d){return key[d]})
       var option = {}
       for (var x=0;x < categorizedItem.length;x++){
-        option[categorizedItem[x]] = d3.set(csv.map(function(item){return item[categorizedItem[x]]})).values()
+        var values = csv.map(function(item){return item[categorizedItem[x]]})
+        var keys = d3.set(values).values()
+        option[categorizedItem[x]] = keys.map(function(key){return [ key,values.filter(function(d){return  d==key}).length ]})
       }
       return option
     }
