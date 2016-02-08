@@ -1,18 +1,65 @@
 <html>
   <head>
     <title>Searchable CSV</title>
-
     <script src="/static/d3.min.js" charset="utf-8"></script>
     <script src="/static/jquery-2.2.0.min.js" charset="utf-8"></script>
-
     <link rel="stylesheet" href="/static/bootstrap.min.css">
     <script src="/static/bootstrap.min.js" ></script>
-
     <link rel="stylesheet" href="/static/jquery.dataTables.min.css">
     <script src="/static/jquery.dataTables.min.js" charset="utf-8"></script>
+    <script src="/static/jquery.drawPieChart.js" charset="utf-8"></script>
+    <script src="/static/randomColor.js" charset="utf-8"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <style>
       b {font-size: 20px;}
+      #chartPanel{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .chart_p {
+        text-align: center;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        margin-left: 15px;
+        margin-right: 15px
+      }
+      .pieTip {
+        position: absolute;
+        float: left;
+        min-width: 30px;
+        max-width: 300px;
+        padding: 5px 18px 6px;
+        border-radius: 2px;
+        background: rgba(255,255,255,.97);
+        color: #444;
+        font-size: 19px;
+        text-shadow: 0 1px 0 #fff;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 1.3;
+        letter-spacing: .06em;
+        box-shadow: 0 0 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.5);
+        -webkit-transform: all .3s;
+        -moz-transform: all .3s;
+        -ms-transform: all .3s;
+        -o-transform: all .3s;
+        transform: all .3s;
+        pointer-events: none;
+      }
+      .pieTip:after {
+        position: absolute;
+        left: 50%;
+        bottom: -6px;
+        content: "";
+        height: 0;
+        margin: 0 0 0 -6px;
+        border-right: 5px solid transparent;
+        border-left: 5px solid transparent;
+        border-top: 6px solid rgba(255,255,255,.95);
+        line-height: 0;
+      }
+      .chart path { cursor: pointer; }
     </style>
 
   </head>
@@ -23,7 +70,10 @@
         <div id="optionPanel" style="display:none;">
           <div class="panel panel-default">
             <div class="panel-heading"><b>Filter</b></div>
-            <div class="panel-body"><button class="btn btn-success btn-block" type="button" onclick="showTable(csv)">Show All</button></div>
+            <div class="panel-body">
+              <button class="btn btn-success btn-block" type="button" onclick="showTable(csv)">Show All</button>
+              <button class="btn btn-default btn-block" type="button" onclick="toggleChart()">Toggle Chart</button>
+            </div>
             <!-- List group -->
             <ul class="list-group" id="options"></ul>
           </div>
@@ -31,6 +81,10 @@
 
         <div class="col-md-12" id="tablePanel" style="display:none;opacity:0;">
           <div class="table-responsive" id='table'></div>
+        </div>
+
+        <div class="col-md-10" id="chartPanel" style="display:none;">
+
         </div>
 
         <div class="col-md-12" id="intro" style="display:none;">
@@ -106,9 +160,35 @@
       for (var x=0;x<Keys.length;x++){
         var Key = Keys[x]
         var Items = option[Key].map(function(d){if(d[0]==''){var dText='Null ('+d[1]+')'}else{var dText=d[0]+' ('+d[1]+')'} return '<li><a href="#" data-key="'+Key+'" data-value="'+d[0]+'" onclick="FilteAndShow(this)">'+dText+'</a></li>'}).join('')
-        var output = '<li class="list-group-item"><div class="btn-group btn-block"><button type="button" class="btn btn-default btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+Key+' <span class="caret"></span> </button> <ul class="dropdown-menu"> '+Items+' </ul> </div></li>'
+        var output = '<li class="list-group-item"><div class="btn-group btn-block"><button type="button" class="btn btn-default btn-block" data-key="'+Key+'" dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+Key+' <span class="caret"></span> </button> <ul class="dropdown-menu"> '+Items+' </ul> </div></li>'
         $('#options').append(output)
       }
+    }
+
+    function toggleChart(){
+      $('#tablePanel').fadeToggle()
+      $('#chartPanel').fadeToggle()
+      $('#options').slideToggle()
+      $('.btn-success').slideToggle()
+      if (chartInitiated == false){
+        generateChart(options)
+        chartInitiated = true
+      }
+    }
+
+    function generateChart(option){
+      d3.keys(option).map(function(key){
+        //Generate Div
+        $('#chartPanel').append('<div class="chart_p"><b>'+key+'</b><div id="pie_'+key+'" class="chart"></div></div>')
+        //Set Chart's Width & Height
+        if ($('#tablePanel').width() > 500) {var width_height = $('#tablePanel').width() / 3.269}
+        else {var width_height = $('#tablePanel').width()}
+        $("#pie_"+key).css('width',width_height+'px').css('height',width_height+'px')
+        //Prepare Data
+        var data = option[key].filter(function(d){return d[0]!=''}).map(function(d){ return {title:d[0],value:d[1],color:randomColor({ luminosity: 'light', hue: 'green'}) } })
+        //Put Chart
+        $("#pie_"+key).drawPieChart(data);
+      })
     }
 
     function getParameterByName(name, url) {
@@ -168,6 +248,7 @@
         d3.text("https://crossorigin.me/"+source, function(text) {
           csv = d3.csv.parse(d3.csv.formatRows(d3.csv.parseRows(text).slice(keyRow)));
           if (categorizedItem){
+            chartInitiated = false
             options = getSelectionForCategorizedItem(csv,categorizedItem)
             generateFilter(options)
             $("#tablePanel").removeClass("col-md-12").addClass("col-md-10")
