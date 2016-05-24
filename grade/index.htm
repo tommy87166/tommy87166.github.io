@@ -1,0 +1,160 @@
+<html>
+  <head>
+    <title>成績輸入小幫手</title>
+    <script src="/static/d3.min.js" charset="utf-8"></script>
+    <script src="/static/jquery-2.2.0.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <script src="/static/bootstrap.min.js" ></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="utf-8"/>
+    <style>
+    .main {display: flex;justify-content: center;align-items: center;width: 100%;height: 100%;flex-direction:column;}
+    .opendata {margin: 0px;min-width: 200px;}
+    .inputdata {display: none;}
+    .inputdata > .panel {margin: 0px;min-width: 200px;margin-left: 5px;margin-right: 5px;display: inline-block;vertical-align: top;}
+    .well {margin-bottom: 0px;margin-top: 20px;display: none;}
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+        <div class="main">
+          <div class="panel panel-default opendata">
+            <div class="panel-body"><input onchange="loadfile()" type="file" id="file"></div>
+            <div class="panel-footer" style="display:none;"><button onclick="OKfile()" class="btn btn-success btn-block" type="button">確定</button></div>
+          </div>
+          <div id="preview" class="well">sss</div>
+          <div class="inputdata">
+            <div class="panel panel-default">
+              <div class="panel-body"><input class="form-control" oninput="inputkey()" type="text" id="inputkey" placeholder="搜尋"></div>
+              <ul class="list-group" id="candidate"></ul>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-body"><input class="form-control" type="integer" id="inputscore" placeholder="成績" disabled></div>
+            </div>
+            <div class="panel panel-default" id="output" style="display:none;">
+              <div class="panel-body"><button onclick="output()" class="btn btn-success btn-block" type="button">輸出</button></div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </body>
+  <script>
+    //把字典 Value 轉為 Array
+    function getItems(DICT){
+      var key = Object.keys(DICT)
+      return key.map(function(x){return DICT[x]})
+    }
+    //讀取檔案
+    function loadfile(){
+      var reader = new FileReader();
+      reader.onload = function(data){
+        temp = d3.csv.parse(data.target.result)
+        //#key 獨特性測驗
+        var keys = temp.map(function(x){return x["#key"]})
+        var uniques = []
+        keys.forEach(function(value) {
+            if (uniques.indexOf(value) == -1) {
+                uniques.push(value);
+              }
+        });
+        if (keys.length == uniques.length){
+          source = temp
+          $("#preview").html(JSON.stringify(source));
+          $(".opendata > .panel-footer").slideDown()
+          $("#preview").slideDown()
+        }
+        else{
+          alert("#Key 不為唯一值！")
+          $(".opendata > .panel-footer").slideUp()
+          $("#preview").slideUp()
+        }
+      }
+      reader.readAsText($("#file")[0].files[0])
+    }
+    //確認檔案
+    function OKfile(){
+      $(".opendata").fadeOut(function(){
+        $(".opendata").remove()
+        $("#preview").fadeOut(function(){
+          $("#preview").remove()
+          $(".main").css("flex-direction","row")
+          $(".inputdata").fadeIn()
+        })
+      })
+    }
+    //每次輸入 Key 時觸發
+    function inputkey(){
+      //清除成績
+      $('#inputscore').val("")
+      //抓取輸入的 Key 並搜尋
+      var key = $("#inputkey").val()
+      var filtered = source.filter(function(x){return x["#key"].includes(key)})
+      //如果結果等於 1 就列出結果，否則僅列入有“幾個”結果。
+      $("#candidate").empty()
+      if (filtered.length == 1){
+        $("#candidate").append('<li class="list-group-item active" data-key="'+filtered[0]["#key"]+'">'+getItems(filtered[0]).join(' / ')+'</li>')
+        //抓取已輸入過的成績
+        if (filtered[0]["#key"] in resultScore){$('#inputscore').val(resultScore[filtered[0]["#key"]])}
+        //開放輸入成績
+        $('#inputscore')[0].disabled = false;
+      }
+      else {
+        $("#candidate").append('<li class="list-group-item">有 '+filtered.length+' 個結果，請繼續輸入。</li>')
+        //禁止輸入成績
+        $('#inputscore')[0].disabled = true
+      }
+    }
+    //Key 欄 Enter 時觸發
+    $("#inputkey").keyup(function (e) {
+      if (e.keyCode == 13) {
+        //確認有 1 個結果，若有則轉換焦點
+        if ($('#candidate > .active').length == 1 ){$("#inputscore")[0].focus()}
+      }
+    });
+    //score 欄 Enter 時觸發
+    $("#inputscore").keyup(function (e) {
+      if (e.keyCode == 13) {
+        //抓取 Key 和 Score，儲存 Score 及 輸入順序
+        var key = $('#candidate > .active')[0].dataset['key']
+        var score = $('#inputscore').val()
+        if (resultOrder.indexOf(key) == -1){resultOrder.push(key);}
+        resultScore[key] = score;
+        //清除結果欄和兩個輸入欄、禁止輸入成績
+        $("#candidate").empty()
+        $('#inputkey').val("")
+        $('#inputscore').val("")
+        $('#inputscore')[0].disabled = true
+        //轉換焦點
+        $("#inputkey")[0].focus()
+        //檢查是否輸入完成
+        if (Object.keys(resultScore).length == source.length){$("#output").slideDown()}
+        else {$("#output").slideUp()}
+      }
+    });
+    //下載
+    function output(){
+      var merged = resultOrder.map(function(key){
+        var from_source = source.filter(function(x){return x["#key"] == key})
+        if (from_source.length == 1){
+          from_source = from_source[0]
+          from_source["#score"] = resultScore[key]
+          return from_source
+        }
+        else {return false}
+      })
+      if (merged.indexOf(false) == -1){
+        var encodedUri = encodeURI("data:text/csv;charset=big5,"+d3.csv.format(merged));
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "score.csv");
+        link.click();
+      }
+      else {
+        alert("處理失敗！請查看 Console。");
+        console.log("Merged:",merged);
+      }
+    }
+    resultOrder = []
+    resultScore = {}
+  </script>
+</html>
