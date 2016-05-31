@@ -5,13 +5,14 @@
     <script src="/static/jquery-2.2.0.min.js" charset="utf-8"></script>
     <link rel="stylesheet" href="/static/bootstrap.min.css">
     <script src="/static/bootstrap.min.js" ></script>
+    <script src="/static/xlsx.core.min.js" ></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8"/>
     <style>
     .main {display: flex;justify-content: center;align-items: center;width: 100%;height: 100%;flex-direction:column;}
     .opendata {margin: 0px;min-width: 200px;}
-    .inputdata {display: none;}
-    .inputdata > .panel {margin: 0px;min-width: 200px;margin-left: 5px;margin-right: 5px;display: inline-block;vertical-align: top;}
+    .inputdata {display: flex;width: 100%;justify-content: center;align-items: flex-start;}
+    .inputdata > .panel {margin: 0px;width: 100%;margin-left: 5px;margin-right: 5px;}
     .well {margin-bottom: 0px;margin-top: 20px;display: none;}
     </style>
   </head>
@@ -23,7 +24,7 @@
             <div class="panel-footer" style="display:none;"><button onclick="OKfile()" class="btn btn-success btn-block" type="button">確定</button></div>
           </div>
           <div id="preview" class="well">sss</div>
-          <div class="inputdata">
+          <div class="inputdata" style="display:none;">
             <div class="panel panel-default">
               <div class="panel-body"><input class="form-control" oninput="inputkey()" type="text" id="inputkey" placeholder="搜尋"></div>
               <ul class="list-group" id="candidate"></ul>
@@ -48,7 +49,8 @@
     function loadfile(){
       var reader = new FileReader();
       reader.onload = function(data){
-        temp = d3.csv.parse(data.target.result)
+        var workbook = XLSX.read(data.target.result, {type: 'binary'});
+        var temp = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]])
         //#key 獨特性測驗
         var keys = temp.map(function(x){return x["#key"]})
         var uniques = []
@@ -69,7 +71,7 @@
           $("#preview").slideUp()
         }
       }
-      reader.readAsText($("#file")[0].files[0])
+      reader.readAsBinaryString($("#file")[0].files[0])
     }
     //確認檔案
     function OKfile(){
@@ -143,11 +145,7 @@
         else {return false}
       })
       if (merged.indexOf(false) == -1){
-        var encodedUri = encodeURI("data:text/csv;charset=big5,"+d3.csv.format(merged));
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "score.csv");
-        link.click();
+        console.log(merged)
       }
       else {
         alert("處理失敗！請查看 Console。");
