@@ -21,6 +21,7 @@
     <div class="container-fluid">
         <div class="main">
           <div class="panel panel-default opendata">
+            <div class="panel-heading">選取 Excel (.xlsx) 檔案</div>
             <div class="panel-body"><input onchange="loadfile()" type="file" id="file"></div>
             <div class="panel-footer" style="display:none;"><button onclick="OKfile()" class="btn btn-success btn-block" type="button">確定</button></div>
           </div>
@@ -173,7 +174,35 @@
         console.log("Merged:",merged);
       }
     }
+    //啟動時是否讀取自動存檔
+    function loadAutosave(){
+      var autosave_source = window.localStorage.getItem("source");
+      var autosave_resultOrder = window.localStorage.getItem("resultOrder");
+      var autosave_resultScore = window.localStorage.getItem("resultScore");
+      if (autosave_source != null & autosave_resultOrder != null & autosave_resultScore != null){
+        //有自動存檔
+        var use_autosave = confirm("您有未完成的存檔，要繼續輸入嗎？\n若不繼續則會刪除該存檔。\n\n以下為未完成的存檔：\n"+autosave_source)
+        if (use_autosave) {
+          //要讀取自動存檔
+          source = JSON.parse(autosave_source)
+          resultOrder = JSON.parse(autosave_resultOrder)
+          resultScore = JSON.parse(autosave_resultScore)
+          //清除開啟檔案框
+          OKfile()
+          //Progress Bar 動畫
+          var percent = Math.round((resultOrder.length/source.length) * 100)+"%"
+          $("#progressBar > b").html(percent)
+          $("#progressBar").css("width",percent)
+        }
+        else{
+          //不讀取自動存檔，則刪除
+          window.localStorage.clear()
+        }
+      }
+    }
+    //啟動時
     resultOrder = []
     resultScore = {}
+    loadAutosave()
   </script>
 </html>
