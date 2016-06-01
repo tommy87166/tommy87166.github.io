@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/static/bootstrap.min.css">
     <script src="/static/bootstrap.min.js" ></script>
     <script src="/static/xlsx.core.min.js" ></script>
+    <link rel="stylesheet" href="/static/animate.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8"/>
     <style>
@@ -13,8 +14,9 @@
     .opendata {margin: 0px;min-width: 200px;}
     .inputdata {display: flex;width: 100%;justify-content: center;align-items: flex-start;}
     .inputdata > .panel {margin: 0px;width: 100%;margin-left: 5px;margin-right: 5px;}
-    .well {margin-bottom: 0px;margin-top: 20px;display: none;}
-    #progressBar {width: 0%;background: #999;height: 2px;margin-top: 10px;margin-left: 6px;margin-right: 6px;text-align: center;transition: width 0.6s;}
+    .well {margin-bottom: 0px;margin-top: 20px;display: none;overflow: auto;}
+    #progressBar {display: none;width: 0%;background: #999;height: 2px;margin-top: 10px;margin-left: 6px;margin-right: 6px;text-align: center;transition: width 0.6s;}
+    #notification {position: fixed;bottom: 0px;right: 0px;left: 0px;text-align: center;}
     </style>
   </head>
   <body>
@@ -40,6 +42,9 @@
           </div>
 
           <div id="progressBar"><b></b></div>
+          <div id="notification"></div>
+
+          </div>
 
         </div>
     </div>
@@ -65,8 +70,12 @@
               }
         });
         if (keys.length == uniques.length){
+          //指定 source
           source = temp
-          $("#preview").html(JSON.stringify(source));
+          //自動存檔 source
+          window.localStorage.setItem("source", JSON.stringify(source));
+          //預覽 source
+          $("#preview").html(d3.csv.format(source).replace(/\n/g,"<br>"));
           $(".opendata > .panel-footer").slideDown()
           $("#preview").slideDown()
         }
@@ -80,12 +89,13 @@
     }
     //確認檔案
     function OKfile(){
+      //消除開啟檔案畫面
       $(".opendata").fadeOut(function(){
         $(".opendata").remove()
         $("#preview").fadeOut(function(){
           $("#preview").remove()
-          //$(".main").css("flex-direction","row")
           $(".inputdata").fadeIn()
+          $("#progressBar").show()
         })
       })
     }
@@ -126,6 +136,8 @@
         var score = $('#inputscore').val()
         if (resultOrder.indexOf(key) == -1){resultOrder.push(key);}
         resultScore[key] = score;
+        //顯示通知
+        showNotification("<b>"+$('#candidate > .active').html()+" / "+score+" 分</b>")
         //清除結果欄和兩個輸入欄、禁止輸入成績
         $("#candidate").empty()
         $('#inputkey').val("")
@@ -137,8 +149,7 @@
         var percent = Math.round((resultOrder.length/source.length) * 100)+"%"
         $("#progressBar > b").html(percent)
         $("#progressBar").css("width",percent)
-        //自動存檔
-        window.localStorage.setItem("source", JSON.stringify(source));
+        //自動存檔 - resultOrder & resultScore
         window.localStorage.setItem("resultOrder", JSON.stringify(resultOrder));
         window.localStorage.setItem("resultScore", JSON.stringify(resultScore));
         //檢查是否輸入完成
@@ -181,24 +192,37 @@
       var autosave_resultScore = window.localStorage.getItem("resultScore");
       if (autosave_source != null & autosave_resultOrder != null & autosave_resultScore != null){
         //有自動存檔
-        var use_autosave = confirm("您有未完成的存檔，要繼續輸入嗎？\n若不繼續則會刪除該存檔。\n\n以下為未完成的存檔：\n"+autosave_source)
+        var autosave_source = JSON.parse(autosave_source)
+        var autosave_resultOrder = JSON.parse(autosave_resultOrder)
+        var autosave_resultScore = JSON.parse(autosave_resultScore)
+        var use_autosave = confirm("您有未完成的存檔，要繼續輸入嗎？\n若按取消放棄則會刪除該存檔。\n\n以下為未完成的存檔：\n"+d3.csv.format(autosave_source))
         if (use_autosave) {
           //要讀取自動存檔
-          source = JSON.parse(autosave_source)
-          resultOrder = JSON.parse(autosave_resultOrder)
-          resultScore = JSON.parse(autosave_resultScore)
+          source = autosave_source
+          resultOrder = autosave_resultOrder
+          resultScore = autosave_resultScore
           //清除開啟檔案框
           OKfile()
+          //提示最後一筆輸入的資料
+          var lastInput = resultOrder[resultOrder.length-1]
+          alert("目前最後一筆輸入為：\n\n"+lastInput+"："+resultScore[lastInput]+"\n\n你可以從這邊繼續輸入。")
           //Progress Bar 動畫
           var percent = Math.round((resultOrder.length/source.length) * 100)+"%"
           $("#progressBar > b").html(percent)
           $("#progressBar").css("width",percent)
+          //檢查是否完成輸入
+          if (Object.keys(resultScore).length == source.length){$("#output").slideDown()}
+          else {$("#output").slideUp()}
         }
         else{
           //不讀取自動存檔，則刪除
           window.localStorage.clear()
         }
       }
+    }
+    //Notificatin
+    function showNotification(content){
+      $("#notification").html('<div class="panel panel-primary animated fadeIn" style="margin:auto;animation-duration:1s;border-radius:0px;"><div class="panel-body">{content}</div></div>'.replace("{content}",content))
     }
     //啟動時
     resultOrder = []
