@@ -34,7 +34,7 @@
               <ul class="list-group" id="candidate"></ul>
             </div>
             <div class="panel panel-default">
-              <div class="panel-body"><input class="form-control" type="integer" id="inputscore" placeholder="成績" disabled></div>
+              <div class="panel-body"><input class="form-control" type="text" id="inputscore" placeholder="成績" disabled></div>
             </div>
             <div class="panel panel-default" id="output" style="display:none;">
               <div class="panel-body"><button onclick="output()" class="btn btn-success btn-block" type="button">輸出</button></div>
@@ -137,7 +137,7 @@
         if (resultOrder.indexOf(key) == -1){resultOrder.push(key);}
         resultScore[key] = score;
         //顯示通知
-        showNotification("<b>"+$('#candidate > .active').html()+" / "+score+" 分</b>")
+        showNotification("<b>"+$('#candidate > .active').html()+" / "+score+"</b>")
         //清除結果欄和兩個輸入欄、禁止輸入成績
         $("#candidate").empty()
         $('#inputkey').val("")
