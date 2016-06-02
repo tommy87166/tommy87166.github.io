@@ -195,7 +195,7 @@
         var autosave_source = JSON.parse(autosave_source)
         var autosave_resultOrder = JSON.parse(autosave_resultOrder)
         var autosave_resultScore = JSON.parse(autosave_resultScore)
-        var use_autosave = confirm("您有未完成的存檔，要繼續輸入嗎？\n若按取消放棄則會刪除該存檔。\n\n以下為未完成的存檔：\n"+d3.csv.format(autosave_source))
+        var use_autosave = confirm("您有未完成的存檔，要繼續輸入嗎？\n若按取消則會刪除該存檔。\n\n以下為未完成的存檔：\n"+d3.csv.format(autosave_source))
         if (use_autosave) {
           //要讀取自動存檔
           source = autosave_source
@@ -205,7 +205,7 @@
           OKfile()
           //提示最後一筆輸入的資料
           var lastInput = resultOrder[resultOrder.length-1]
-          alert("目前最後一筆輸入為：\n\n"+lastInput+"："+resultScore[lastInput]+"\n\n你可以從這邊繼續輸入。")
+          alert("目前最後一筆輸入為：\n\n"+lastInput+"："+resultScore[lastInput])
           //Progress Bar 動畫
           var percent = Math.round((resultOrder.length/source.length) * 100)+"%"
           $("#progressBar > b").html(percent)
