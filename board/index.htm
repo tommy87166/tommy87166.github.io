@@ -1,0 +1,182 @@
+<html>
+    <head>
+        <title>Board</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.js"></script>
+    </head>
+
+    <body>
+        <div id="container"></div>
+
+        <script type="text/babel">
+            function htmlDecode(value){ 
+                return $('<div/>').html(value).text(); 
+            }
+
+            var Note = React.createClass({
+                dragstart:function(e){
+                    this.offsetX = e.clientX - this.props.x
+                    this.offsetY = e.clientY - this.props.y
+                },
+                dragend:function(e){
+                    var obj = {}
+                    obj[this.props.item] = {
+                        width: this.props.width,
+                        height: this.props.height,
+                        x: e.clientX - this.offsetX,
+                        y: e.clientY - this.offsetY,
+                        html:this.props.html,
+                        display:"html"
+                    }
+                    this.props.mainSetState(obj)
+                },
+                dragend_resize:function(e){
+                    console.log("dragend_resize")
+                    var obj = {}
+                    obj[this.props.item] = {
+                        width: e.clientX - this.props.x,
+                        height: e.clientY - this.props.y,
+                        x: this.props.x,
+                        y: this.props.y,
+                        html:this.props.html,
+                        display:"html"
+                    }
+                    this.props.mainSetState(obj)
+                    e.stopPropagation()
+                },
+                doubleclick:function(e){
+                    if(e.ctrlKey){
+                        var obj = {}
+                        obj[this.props.item] = {
+                            display:"remove"
+                        }
+                        this.props.mainSetState(obj)
+                    }
+                    else{
+                        var obj = {}
+                        obj[this.props.item] = {
+                            width: this.props.width,
+                            height: this.props.height,
+                            x: this.props.x,
+                            y: this.props.y,
+                            html:this.props.html,
+                            display:"text"
+                        }
+                        this.props.mainSetState(obj)
+                        e.persist()
+                        setTimeout(function() {e.target.focus();}, 0);
+                        this.changed = false
+                    }
+                },
+                blur:function(e){
+                    if(this.changed){
+                        var obj = {}
+                        obj[this.props.item] = {
+                            width: this.props.width,
+                            height: this.props.height,
+                            x: this.props.x,
+                            y: this.props.y,
+                            html:e.target.innerText,
+                            display:"html"
+                        }
+                    }
+                    else{
+                        var obj = {}
+                        obj[this.props.item] = {
+                            width: this.props.width,
+                            height: this.props.height,
+                            x: this.props.x,
+                            y: this.props.y,
+                            html:this.props.html,
+                            display:"html"
+                        }
+                    }
+                    this.props.mainSetState(obj)
+                },
+                input:function(){
+                    this.changed = true
+                },
+                render: function() {
+                    if (this.props.display == "html"){
+                        return(
+                        <div onDragStart={this.dragstart} onDragEnd={this.dragend} className="panel panel-default" style={{"width":this.props.width,"height":this.props.height,"top":this.props.y,"left":this.props.x,"position":"fixed","margin": 0,"overflow":"auto"}} draggable="true">
+                            <div className="panel-body"  onInput={this.input} onBlur={this.blur} onDoubleClick = {this.doubleclick} style={{"height":"100%"}} dangerouslySetInnerHTML={{__html: this.props.html}}></div>
+                            <div onDragEnd={this.dragend_resize} style={{"position":"absolute","bottom":0.5,"right":0.5,"width":20,"height":20,"cursor":"nwse-resize"}} draggable="true"> </div>
+                        </div>
+                        )
+                    }
+
+                    if (this.props.display == "text"){
+                        return(
+                        <div onDragStart={this.dragstart} onDragEnd={this.dragend} className="panel panel-default" style={{"width":this.props.width,"height":this.props.height,"top":this.props.y,"left":this.props.x,"position":"fixed","margin": 0}} draggable="true">
+                            <div className="panel-body" contentEditable="true" onInput={this.input} onBlur={this.blur} onDoubleClick = {this.doubleclick} style={{"height":"100%"}}>
+                                {this.props.html}
+                            </div>
+                            <div onDragEnd={this.dragend_resize} style={{"position":"absolute","bottom":0.5,"right":0.5,"width":20,"height":20,"cursor":"nwse-resize"}} draggable="true"> </div>
+                        </div>
+                        )
+                    }
+                    
+                    if (this.props.display == "remove"){
+                        return null
+                    }
+
+                }
+            });
+
+            var myStorage = window.localStorage
+
+            var Main = React.createClass({
+                getInitialState: function() {
+                    if (myStorage.length == 0){
+                        return {}
+                    }
+                    else{
+                        var notes =  JSON.parse(myStorage.getItem("notes"))
+                        Object.keys(notes).map(function(key){
+	                        if(notes[key].display=="remove"){
+		                        console.log(key)
+                                delete notes[key]
+	                        }
+                        })
+                        return notes
+                    }
+                },
+                doubleclick:function(e){
+                    if(e.target.id == "Main"){
+                        var obj = {}
+                        obj[ Math.random().toString(36).substring(7) ] = {width: 300, height: 300, x: e.clientX, y: e.clientY,html:"",display:"html"}
+                        this.setState(obj)
+                    }
+                },
+                render: function() {
+                    myStorage.setItem("notes",JSON.stringify(this.state))
+                    var notes = Object.keys(this.state).map(function(key){
+                        return(
+                            <Note item={key} width={this.state[key].width} height={this.state[key].height} x={this.state[key].x} y={this.state[key].y} html={this.state[key].html} display={this.state[key].display} mainSetState={this.setState.bind(this)}/>
+                        )
+                    }.bind(this))
+                    return(
+                        <div id="Main" onDoubleClick={this.doubleclick} style={{"width":"100%","height":"100%"}}>
+                            {notes}
+                        </div>
+                    )
+                }
+            })
+
+            ReactDOM.render(
+                <Main/>,
+                document.getElementById('container')
+            );
+
+        </script>
+
+    </body>
+
+
+
+</html>
