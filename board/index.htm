@@ -19,6 +19,8 @@
 
             var Note = React.createClass({
                 dragstart:function(e){
+		    var img = new Image()
+		    e.dataTransfer.setDragImage(img, 10, 10)
                     this.offsetX = e.clientX - this.props.x
                     this.offsetY = e.clientY - this.props.y
                 },
